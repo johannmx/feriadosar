@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Sun, Moon, Monitor, CalendarDays, ChevronDown } from 'lucide-react';
 import { useTheme } from './hooks/useTheme';
 import { HolidayCard } from './components/HolidayCard';
