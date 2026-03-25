@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: ghcr.io/${GITHUB_REPOSITORY:-tu-usuario/feriadosar}:latest
+    image: ghcr.io/johannmx/feriadosar:latest
     container_name: feriadosar-frontend
     ports:
       - "8080:80"

@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   frontend:
-    image: ghcr.io/${GITHUB_REPOSITORY:-johannmx/feriadosar}:latest
+    image: ghcr.io/johannmx/feriadosar:latest
     container_name: feriadosar-prod
     ports:
       - "80:80"
