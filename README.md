@@ -1,68 +1,67 @@
-# Feriados AR
+# 🚀 Argentina Holidays Calendar - Premium Dashboard
 
-Calendario anual de feriados en Argentina. Una aplicación web moderna y rápida para visualizar los feriados nacionales (inamovibles, trasladables, puentes) en formato de lista y calendario interactivo.
+Una aplicación web moderna y de alto rendimiento para visualizar los feriados nacionales en Argentina, con una interfaz intuitiva, soporte para múltiples vistas y una arquitectura optimizada para despliegue global.
 
-## Características
-- **Vista de Lista:** Tarjetas detalladas con información de cada feriado.
-- **Vista de Calendario:** Calendario visual interactivo de todo el año.
-- **Modo Oscuro/Claro:** Soporte nativo y selección manual.
-- **Diseño Responsivo:** Adaptado completamente a dispositivos móviles.
+![Status](https://img.shields.io/badge/Status-Live-success?style=for-the-badge)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![Tailwind](https://img.shields.io/badge/Tailwind-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
-## Tecnologías Usadas
-- [React](https://reactjs.org/) + [Vite](https://vitejs.dev/)
-- [TypeScript](https://www.typescriptlang.org/)
-- [TailwindCSS](https://tailwindcss.com/)
-- [Lucide React](https://lucide.dev/) (Iconos)
+## ✨ Características Principales
 
-## API de Datos
-Los datos sobre los feriados son obtenidos dinámicamente utilizando la API pública de [ArgentinaDatos](https://argentinadatos.com/).
+- 📅 **Vista Dual Inteligente**: Alterna entre una **Vista de Lista** detallada con tarjetas informativas y una **Vista de Calendario** completa para una planificación anual eficiente.
+- 🌓 **Modo Oscuro Premium**: Interfaz adaptativa que respeta la preferencia del sistema o permite selección manual, optimizada para reducir la fatiga visual.
+- 📱 **Diseño Ultra-Responsivo**: Experiencia de usuario fluida y consistente en móviles, tablets y escritorio, con componentes táctiles optimizados.
+- 🔄 **Sincronización en Tiempo Real**: Integración directa con la API oficial de **ArgentinaDatos** para garantizar que la información de feriados (inamovibles, trasladables y puentes) esté siempre actualizada.
+- 🎨 **Estética Moderna**: Construido con **TailwindCSS** siguiendo principios de diseño limpio, con tipografías legibles y micro-interacciones fluidas.
+- 🌍 **Multi-Arquitectura**: Imágenes de Docker optimizadas para **amd64** y **arm64**, permitiendo el despliegue en servidores tradicionales o dispositivos como Raspberry Pi.
 
-## Cómo Levantar el Proyecto
+## 🏗️ Arquitectura
 
-### Opción 1: Desarrollo Local (Node.js)
-1. Clonar el repositorio:
+- **Frontend**: React 19 + Vite (Ecosistema moderno y ultrarrápido).
+- **Styling**: TailwindCSS (Utility-first CSS para máxima consistencia visual).
+- **Icons**: Lucide React (Set de iconos minimalista y consistente).
+- **Deployment**: Nginx (Servidor de alto rendimiento para contenido estático).
+- **CI/CD**: GitHub Actions para builds automatizados y publicación en GHCR.
+
+## 🚀 Cómo Empezar
+
+### Requisitos Previos
+- Node.js 20+ (para desarrollo local)
+- Docker y Docker Compose (para despliegue simplificado)
+
+### Despliegue Rápido (Producción)
+Si quieres levantarlo usando las imágenes ya compiladas en GitHub Container Registry:
+
+1. Clona el repositorio.
+2. Ejecuta:
    ```bash
-   git clone https://github.com/tu-usuario/feriadosar.git
-   cd feriadosar
+   docker compose -f docker-compose.prod.yml up -d
    ```
-2. Instalar dependencias:
+   La aplicación estará disponible en `http://localhost`.
+
+### Desarrollo Local
+Para trabajar en el código base y ver los cambios en tiempo real:
+
+1. Instala las dependencias:
    ```bash
    npm install
    ```
-3. Iniciar el servidor de desarrollo:
+2. Inicia el servidor de desarrollo:
    ```bash
    npm run dev
    ```
+   El frontend estará disponible en `http://localhost:5173`.
 
-### Opción 2: Docker Compose (Desarrollo/Local)
-Este proyecto incluye soporte para ser levantado de manera sencilla utilizando Docker, soportando arquitecturas AMD64 y ARM64.
+## 📦 Infraestructura y Docker
+El proyecto está diseñado para ser agnóstico a la infraestructura gracias a Docker. Puedes encontrar las configuraciones en:
+- `Dockerfile`: Construcción multi-etapa (Build & Serve).
+- `docker-compose.yml`: Configuración para desarrollo local.
+- `docker-compose.prod.yml`: Configuración optimizada para producción.
 
-1. Clonar el repositorio y acceder a la carpeta:
-   ```bash
-   git clone https://github.com/tu-usuario/feriadosar.git
-   cd feriadosar
-   ```
-2. Levantar el contenedor:
-   ```bash
-   docker-compose up -d
-   ```
-3. El proyecto estará disponible en `http://localhost:8080`.
+## 📄 Licencia
+Este proyecto está bajo la Licencia MIT. Consulta el archivo [LICENSE](./LICENSE) para más detalles.
 
-### Opción 3: Docker Compose (Producción)
-Para entornos de producción, se recomienda usar el archivo específico que utiliza las imágenes pre-construidas:
-
-```bash
-docker-compose -f docker-compose.prod.yml up -d
-```
-Esto levantará la aplicación en el puerto `80` (ajustable en el archivo `.yml`).
-
-
-### Construcción Manual para Producción
-Para construir la versión optimizada:
-```bash
-npm run build
-```
-Luego puedes servir la carpeta `dist/` con cualquier servidor estático o Docker.
-
-## Licencia
-Este proyecto está bajo la Licencia MIT - mira el archivo [LICENSE](LICENSE) para detalles.
+---
+Hecho con ✨ por **Johann** y **Antigravity**.

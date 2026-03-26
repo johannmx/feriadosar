@@ -1,28 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <style>
-    @media (prefers-color-scheme: dark) {
-      .bg { fill: #ffffff; }
-      .icon { stroke: #0f172a; }
-    }
-    @media (prefers-color-scheme: light) {
-      .bg { fill: #0f172a; }
-      .icon { stroke: #ffffff; }
-    }
-    /* Fallback for browsers that don't support media queries in SVG (though most modern ones do) */
-    .bg { fill: #0f172a; }
-    .icon { stroke: #ffffff; }
-  </style>
-  <rect class="bg" width="100" height="100" rx="20" />
-  <g class="icon" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none" transform="translate(15, 15) scale(2.9)">
-    <rect width="18" height="18" x="3" y="4" rx="2"/>
-    <path d="M16 2v4"/>
-    <path d="M8 2v4"/>
-    <path d="M3 10h18"/>
-    <path d="M8 14h.01"/>
-    <path d="M12 14h.01"/>
-    <path d="M16 14h.01"/>
-    <path d="M8 18h.01"/>
-    <path d="M12 18h.01"/>
-    <path d="M16 18h.01"/>
+  <rect width="100" height="100" rx="20" fill="#0f172a" />
+  <g fill="white" transform="translate(25, 25) scale(2.08)">
+    <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM9 14H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2zm-8 4H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z"/>
   </g>
 </svg>
