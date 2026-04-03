@@ -31,15 +31,25 @@ export default function App() {
   useEffect(() => {
     const fetchHolidays = async () => {
       setLoading(true);
+
+      // Security Enhancement: Add timeout to external API call
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
       try {
-        const res = await fetch(`https://api.argentinadatos.com/v1/feriados/${year}`);
+        const res = await fetch(`https://api.argentinadatos.com/v1/feriados/${year}`, {
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
         if (!res.ok) throw new Error('API down');
         const data = await res.json();
         setHolidays(data);
         setApiStatus('up');
-      } catch (error) {
+      } catch {
         setApiStatus('down');
-        console.error('Error fetching holidays', error);
+        // Security Enhancement: Sanitize error logging to prevent leaking sensitive information
+        console.error('Error fetching holidays. External API might be down or timed out.');
       } finally {
         setLoading(false);
       }
