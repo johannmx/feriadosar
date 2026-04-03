@@ -1,0 +1,4 @@
+## 2026-03-25 - [Add Timeout and Error Sanitization to External API Call]
+**Vulnerability:** The `fetch` call to `https://api.argentinadatos.com` in `App.tsx` had no timeout configuration, meaning the application could hang or suffer resource exhaustion if the external API responds very slowly or indefinitely. Additionally, raw error objects were being passed to `console.error()`, which can leak internal stack traces or details to the browser console. Finally, the project had an outdated dependency `brace-expansion` causing an audit warning.
+**Learning:** External API integrations without timeout limits and unsanitized error logging are common medium-severity security and stability risks in frontend components. Fixing these provides better defense in depth.
+**Prevention:** Always implement an `AbortController` and `setTimeout` alongside `fetch` calls, and avoid logging full error object details directly to the console in production environments.
