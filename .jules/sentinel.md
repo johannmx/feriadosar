@@ -2,3 +2,8 @@
 **Vulnerability:** The `fetch` call to `https://api.argentinadatos.com` in `App.tsx` had no timeout configuration, meaning the application could hang or suffer resource exhaustion if the external API responds very slowly or indefinitely. Additionally, raw error objects were being passed to `console.error()`, which can leak internal stack traces or details to the browser console. Finally, the project had an outdated dependency `brace-expansion` causing an audit warning.
 **Learning:** External API integrations without timeout limits and unsanitized error logging are common medium-severity security and stability risks in frontend components. Fixing these provides better defense in depth.
 **Prevention:** Always implement an `AbortController` and `setTimeout` alongside `fetch` calls, and avoid logging full error object details directly to the console in production environments.
+
+## 2026-04-04 - [Add NGINX Security Headers in Production Dockerfile]
+**Vulnerability:** The production `Dockerfile` configured an NGINX server without important HTTP security headers (like `X-Frame-Options`, `X-Content-Type-Options`, `Content-Security-Policy`, and `Referrer-Policy`) and leaked the NGINX version via the `Server` header. This could leave the application open to Clickjacking, MIME-type sniffing, XSS, and information disclosure attacks.
+**Learning:** Containerized static websites often use basic NGINX configurations that default to insecure settings. Even purely static sites should enforce a strong Content Security Policy and basic anti-framing headers to follow defense-in-depth principles.
+**Prevention:** Always explicitly configure secure headers (e.g., CSP, X-Frame-Options, X-Content-Type-Options) and disable `server_tokens` in NGINX container configurations.

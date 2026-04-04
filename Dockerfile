@@ -13,6 +13,11 @@ COPY --from=build /app/dist /usr/share/nginx/html
 # To support React Router (if used), we'd need a custom nginx.conf or simply replace the default.conf
 RUN echo "server { \
     listen 80; \
+    server_tokens off; \
+    add_header X-Frame-Options \"SAMEORIGIN\"; \
+    add_header X-Content-Type-Options \"nosniff\"; \
+    add_header Referrer-Policy \"strict-origin-when-cross-origin\"; \
+    add_header Content-Security-Policy \"default-src 'self'; script-src 'self' 'unsafe-inline' https://umami.johatech.ar; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.argentinadatos.com https://umami.johatech.ar; img-src 'self' data:;\"; \
     location / { \
         root /usr/share/nginx/html; \
         index index.html index.htm; \
