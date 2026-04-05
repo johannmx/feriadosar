@@ -1,9 +1,14 @@
 import { useEffect, useState } from 'react';
 
 export function useTheme() {
-  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>(
-    () => (localStorage.getItem('theme') as 'light' | 'dark' | 'system') || 'system'
-  );
+  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>(() => {
+    // Security Enhancement: Validate localStorage input to prevent DOM injection via classList
+    const storedTheme = localStorage.getItem('theme');
+    if (storedTheme === 'light' || storedTheme === 'dark' || storedTheme === 'system') {
+      return storedTheme;
+    }
+    return 'system';
+  });
 
   useEffect(() => {
     const root = window.document.documentElement;
