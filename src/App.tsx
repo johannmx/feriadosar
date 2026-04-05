@@ -44,7 +44,27 @@ export default function App() {
 
         if (!res.ok) throw new Error('API down');
         const data = await res.json();
-        setHolidays(data);
+
+        // Security Enhancement: Validate external API input
+        if (!Array.isArray(data)) {
+          throw new Error('Invalid API response format');
+        }
+
+        // Enforce maximum length to prevent DoS via excessive DOM rendering
+        const MAX_HOLIDAYS = 100;
+        if (data.length > MAX_HOLIDAYS) {
+          throw new Error('API response too large');
+        }
+
+        // Type validate each item to ensure no malicious injection
+        const validatedHolidays = data.filter(h =>
+          h &&
+          typeof h.fecha === 'string' &&
+          typeof h.tipo === 'string' &&
+          typeof h.nombre === 'string'
+        );
+
+        setHolidays(validatedHolidays);
         setApiStatus('up');
       } catch {
         setApiStatus('down');
