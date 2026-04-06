@@ -57,11 +57,15 @@ export default function App() {
         }
 
         // Type validate each item to ensure no malicious injection
+        // Prevent application crash (DoS) from invalid dates and limit string lengths
         const validatedHolidays = data.filter(h =>
           h &&
           typeof h.fecha === 'string' &&
+          !isNaN(new Date(h.fecha + 'T00:00:00').getTime()) &&
           typeof h.tipo === 'string' &&
-          typeof h.nombre === 'string'
+          h.tipo.length <= 50 &&
+          typeof h.nombre === 'string' &&
+          h.nombre.length <= 255
         );
 
         setHolidays(validatedHolidays);
