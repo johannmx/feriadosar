@@ -29,11 +29,12 @@ export default function App() {
   const [apiStatus, setApiStatus] = useState<'checking' | 'up' | 'down'>('checking');
 
   useEffect(() => {
+    // Security Enhancement: Add timeout to external API call
+    const controller = new AbortController();
+
     const fetchHolidays = async () => {
       setLoading(true);
 
-      // Security Enhancement: Add timeout to external API call
-      const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
 
       try {
@@ -79,6 +80,10 @@ export default function App() {
       }
     };
     fetchHolidays();
+
+    return () => {
+      controller.abort();
+    };
   }, [year]);
 
   return (
