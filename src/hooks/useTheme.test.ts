@@ -26,7 +26,7 @@ describe('useTheme', () => {
       removeEventListener: vi.fn(),
       dispatchEvent: vi.fn(),
     }));
-    window.matchMedia = matchMediaSpy;
+    window.matchMedia = matchMediaSpy as any;
   });
 
   afterEach(() => {
