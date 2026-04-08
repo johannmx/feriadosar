@@ -18,6 +18,8 @@ RUN echo "server { \
     add_header X-Content-Type-Options \"nosniff\"; \
     add_header Referrer-Policy \"strict-origin-when-cross-origin\"; \
     add_header Content-Security-Policy \"default-src 'self'; script-src 'self' https://umami.johatech.ar; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.argentinadatos.com https://umami.johatech.ar; img-src 'self' data:;\"; \
+    add_header Strict-Transport-Security \"max-age=31536000; includeSubDomains\" always; \
+    add_header Permissions-Policy \"geolocation=(), camera=(), microphone=()\"; \
     location / { \
         root /usr/share/nginx/html; \
         index index.html index.htm; \
