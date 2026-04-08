@@ -28,9 +28,16 @@ export const CalendarView = ({ year, holidays }: CalendarViewProps) => {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
       {MONTHS.map((monthName, mIdx) => {
         const daysInMonth = new Date(year, mIdx + 1, 0).getDate();
+        const firstOfMonth = new Date(year, mIdx, 1);
+
         // firstDay index: 0 is Monday ... 6 is Sunday
-        let firstDay = new Date(year, mIdx, 1).getDay() - 1; 
+        let firstDay = firstOfMonth.getDay() - 1;
         if (firstDay === -1) firstDay = 6;
+
+        // 0 (Sun) to 6 (Sat)
+        const startDayOfWeek = firstOfMonth.getDay();
+        const monthStr = String(mIdx + 1).padStart(2, '0');
+        const datePrefix = `${year}-${monthStr}-`;
 
         const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
@@ -48,10 +55,11 @@ export const CalendarView = ({ year, holidays }: CalendarViewProps) => {
               {[...Array(firstDay)].map((_, i) => <div key={`empty-${i}`} />)}
               
               {days.map(day => {
-                const dateStr = `${year}-${String(mIdx + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dateStr = `${datePrefix}${day < 10 ? '0' : ''}${day}`;
                 const holiday = holidayMap.get(dateStr);
-                const dateObj = new Date(year, mIdx, day);
-                const isWeekend = dateObj.getDay() === 0 || dateObj.getDay() === 6;
+
+                const dayOfWeek = (startDayOfWeek + (day - 1)) % 7;
+                const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
                 const isToday = dateStr === todayStr;
 
                 let colorClasses = "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50";
