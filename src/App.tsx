@@ -122,7 +122,7 @@ export default function App() {
                   <div className="absolute top-full left-0 sm:left-auto sm:right-0 mt-3 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-xl rounded-2xl overflow-hidden min-w-[120px] max-h-56 overflow-y-auto z-50">
                   <div className="flex flex-col py-2">
                     {[...Array(11)].map((_, i) => {
-                      const y = 2026 - i; // Ordenar del más nuevo al más viejo
+                      const y = (new Date().getFullYear() + 1) - i; // Ordenar del más nuevo al más viejo
                       return (
                         <button
                           key={y}
