@@ -38,6 +38,11 @@ export default function App() {
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
 
       try {
+        // Security Enhancement: Validate network request parameter to prevent path traversal/SSRF
+        if (typeof year !== 'number' || year < 2000 || year > 2100) {
+          throw new Error('Invalid year parameter');
+        }
+
         const res = await fetch(`https://api.argentinadatos.com/v1/feriados/${year}`, {
           signal: controller.signal
         });
