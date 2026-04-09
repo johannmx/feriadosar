@@ -1,4 +1,5 @@
 import { Calendar } from 'lucide-react';
+import { getTodayDateString } from '../utils/dateUtils';
 
 interface HolidayCardProps {
   fecha: string;
@@ -16,7 +17,7 @@ export const HolidayCard = ({ fecha, tipo, nombre, color }: HolidayCardProps) =>
   // Use local time from env if possible, otherwise browser time
   // Current time is 2026-03-25T15:25:47-03:00 -> en-CA formats to '2026-03-25'
 
-  const isPast = fecha < new Date().toLocaleDateString('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' });
+  const isPast = fecha < getTodayDateString();
 
   return (
     <div className={`bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-md transition-all duration-300 relative overflow-hidden group h-full justify-between min-h-[200px] flex flex-col ${isPast ? 'opacity-50 grayscale hover:opacity-100 hover:grayscale-0' : ''}`}>

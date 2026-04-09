@@ -1,6 +1,7 @@
 
 
 import { useMemo } from 'react';
+import { getTodayDateString } from '../utils/dateUtils';
 
 interface Holiday {
   fecha: string;
@@ -27,7 +28,7 @@ export const CalendarView = ({ year, holidays }: CalendarViewProps) => {
   }, [holidays]);
 
   // Use local time matching Argentina
-  const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' });
+  const todayStr = getTodayDateString();
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
