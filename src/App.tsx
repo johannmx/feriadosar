@@ -26,6 +26,8 @@ const LEGEND_ITEMS = [
   { label: 'Hoy', color: 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700 ring-2 ring-indigo-500' },
 ];
 
+const availableYears = Array.from({ length: 11 }, (_, i) => new Date().getFullYear() + 1 - i);
+
 export default function App() {
   const { theme, setTheme } = useTheme();
   const [holidays, setHolidays] = useState<Holiday[]>([]);
@@ -133,25 +135,22 @@ export default function App() {
                   <div className="fixed inset-0 z-40" onClick={() => setIsDropdownOpen(false)} />
                   <div className="absolute top-full left-0 sm:left-auto sm:right-0 mt-3 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-xl rounded-2xl overflow-hidden min-w-[120px] max-h-56 overflow-y-auto z-50">
                   <div className="flex flex-col py-2">
-                    {[...Array(11)].map((_, i) => {
-                      const y = (new Date().getFullYear() + 1) - i; // Ordenar del más nuevo al más viejo
-                      return (
-                        <button
-                          key={y}
-                          onClick={() => {
-                            setYear(y);
-                            setIsDropdownOpen(false);
-                          }}
-                          className={`px-5 py-2 text-sm text-left font-bold transition-colors
-                            ${year === y 
-                              ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' 
-                              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'
-                            }`}
-                        >
-                          {y}
-                        </button>
-                      );
-                    })}
+                    {availableYears.map((y) => (
+                      <button
+                        key={y}
+                        onClick={() => {
+                          setYear(y);
+                          setIsDropdownOpen(false);
+                        }}
+                        className={`px-5 py-2 text-sm text-left font-bold transition-colors
+                          ${year === y
+                            ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'
+                          }`}
+                      >
+                        {y}
+                      </button>
+                    ))}
                   </div>
                 </div>
                 </>
