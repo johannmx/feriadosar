@@ -1,5 +1,7 @@
 
 
+import { useMemo } from 'react';
+
 interface Holiday {
   fecha: string;
   tipo: string;
@@ -18,8 +20,11 @@ const MONTHS = [
 
 export const CalendarView = ({ year, holidays }: CalendarViewProps) => {
   // Map from "YYYY-MM-DD" to holiday object
-  const holidayMap = new Map<string, Holiday>();
-  holidays.forEach(h => holidayMap.set(h.fecha, h));
+  const holidayMap = useMemo(() => {
+    const map = new Map<string, Holiday>();
+    holidays.forEach(h => map.set(h.fecha, h));
+    return map;
+  }, [holidays]);
 
   // Use local time matching Argentina
   const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' });
