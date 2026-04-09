@@ -19,6 +19,13 @@ const COLORS = [
   'bg-indigo-500',
 ];
 
+const LEGEND_ITEMS = [
+  { label: 'Inamovible', color: 'bg-orange-100 dark:bg-orange-900/40 border-orange-200 dark:border-orange-800' },
+  { label: 'Trasladable', color: 'bg-blue-100 dark:bg-blue-900/40 border-blue-200 dark:border-blue-800' },
+  { label: 'Puente', color: 'bg-green-100 dark:bg-green-900/40 border-green-200 dark:border-green-800' },
+  { label: 'Hoy', color: 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700 ring-2 ring-indigo-500' },
+];
+
 export default function App() {
   const { theme, setTheme } = useTheme();
   const [holidays, setHolidays] = useState<Holiday[]>([]);
@@ -179,12 +186,7 @@ export default function App() {
         {/* LEGEND (Only for Calendar View) */}
         {!loading && activeTab === 'calendario' && (
           <div className="flex flex-wrap justify-center gap-6 mb-10 transition-all duration-500 ease-in-out">
-            {[
-              { label: 'Inamovible', color: 'bg-orange-100 dark:bg-orange-900/40 border-orange-200 dark:border-orange-800' },
-              { label: 'Trasladable', color: 'bg-blue-100 dark:bg-blue-900/40 border-blue-200 dark:border-blue-800' },
-              { label: 'Puente', color: 'bg-green-100 dark:bg-green-900/40 border-green-200 dark:border-green-800' },
-              { label: 'Hoy', color: 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700 ring-2 ring-indigo-500' },
-            ].map((item) => (
+            {LEGEND_ITEMS.map((item) => (
               <div key={item.label} className="flex items-center gap-2.5">
                 <div className={`w-3 h-3 rounded-md border ${item.color}`} />
                 <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">{item.label}</span>
