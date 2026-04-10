@@ -73,15 +73,17 @@ export default function App() {
 
         // Type validate each item to ensure no malicious injection
         // Prevent application crash (DoS) from invalid dates and limit string lengths
-        const validatedHolidays = data.filter(h =>
-          h &&
-          typeof h.fecha === 'string' &&
-          !isNaN(new Date(h.fecha + 'T00:00:00').getTime()) &&
-          typeof h.tipo === 'string' &&
-          h.tipo.length <= 50 &&
-          typeof h.nombre === 'string' &&
-          h.nombre.length <= 255
-        );
+        const validatedHolidays = data.filter((h: unknown) => {
+          if (!h || typeof h !== 'object') return false;
+          const item = h as Record<string, unknown>;
+          return typeof item.fecha === 'string' &&
+                 item.fecha.length === 10 &&
+                 !isNaN(new Date(item.fecha + 'T00:00:00').getTime()) &&
+                 typeof item.tipo === 'string' &&
+                 item.tipo.length <= 50 &&
+                 typeof item.nombre === 'string' &&
+                 item.nombre.length <= 255;
+        }) as Holiday[];
 
         setHolidays(validatedHolidays);
         setApiStatus('up');
