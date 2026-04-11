@@ -1,27 +1,20 @@
-version: '3.8'
-
+# Development: builds from source
 services:
   api:
-    build:
-      context: ./web/api
+    build: ./web/api
+    container_name: feriadosar-api-dev
     ports:
       - "3001:3001"
     environment:
       - PORT=3001
       - NODE_ENV=development
-    volumes:
-      - ./web/api:/app
-      - /app/node_modules
+    restart: always
 
   client:
-    build:
-      context: ./web/client
+    build: ./web/client
+    container_name: feriadosar-client-dev
     ports:
-      - "5173:5173"
-    environment:
-      - VITE_API_URL=http://localhost:3001
-    volumes:
-      - ./web/client:/app
-      - /app/node_modules
+      - "5173:80"
     depends_on:
       - api
+    restart: always
