@@ -3,9 +3,14 @@ import { useEffect, useState } from 'react';
 export function useTheme() {
   const [theme, setTheme] = useState<'light' | 'dark' | 'system'>(() => {
     // Security Enhancement: Validate localStorage input to prevent DOM injection via classList
-    const storedTheme = localStorage.getItem('theme');
-    if (storedTheme === 'light' || storedTheme === 'dark' || storedTheme === 'system') {
-      return storedTheme;
+    // Also gracefully handle SecurityError when localStorage is blocked by browser privacy settings
+    try {
+      const storedTheme = localStorage.getItem('theme');
+      if (storedTheme === 'light' || storedTheme === 'dark' || storedTheme === 'system') {
+        return storedTheme;
+      }
+    } catch {
+      // Ignore error to fail securely without crashing the app
     }
     return 'system';
   });
@@ -20,7 +25,11 @@ export function useTheme() {
     }
     
     root.classList.add(activeTheme);
-    localStorage.setItem('theme', theme);
+    try {
+      localStorage.setItem('theme', theme);
+    } catch {
+      // Ignore error to fail securely without crashing the app
+    }
 
     // iOS Safari adjustment
     let metaThemeColor = document.querySelector('meta[name="theme-color"]');
