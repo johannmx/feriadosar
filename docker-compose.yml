@@ -1,11 +1,17 @@
-
 services:
-  frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: ghcr.io/johannmx/feriadosar:latest
-    container_name: feriadosar-frontend
+  api:
+    build: ./web/api
     ports:
-      - "8080:80"
-    restart: unless-stopped
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - NODE_ENV=development
+    restart: always
+
+  client:
+    build: ./web/client
+    ports:
+      - "5173:80"
+    depends_on:
+      - api
+    restart: always
