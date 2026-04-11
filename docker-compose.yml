@@ -1,17 +1,27 @@
+version: '3.8'
+
 services:
   api:
-    build: ./web/api
+    build:
+      context: ./web/api
     ports:
       - "3001:3001"
     environment:
       - PORT=3001
       - NODE_ENV=development
-    restart: always
+    volumes:
+      - ./web/api:/app
+      - /app/node_modules
 
   client:
-    build: ./web/client
+    build:
+      context: ./web/client
     ports:
-      - "5173:80"
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:3001
+    volumes:
+      - ./web/client:/app
+      - /app/node_modules
     depends_on:
       - api
-    restart: always
