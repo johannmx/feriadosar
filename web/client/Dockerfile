@@ -9,8 +9,6 @@ RUN npm run build
 # Production stage
 FROM nginx:stable
 COPY --from=build /app/dist /usr/share/nginx/html
-# Copy custom nginx config if we had one, but default is fine for simple SPA if we add SPA routing.
-# To support React Router (if used), we'd need a custom nginx.conf or simply replace the default.conf
 RUN echo "server { \
     listen 80; \
     server_tokens off; \
