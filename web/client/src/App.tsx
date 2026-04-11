@@ -52,7 +52,7 @@ export default function App() {
           throw new Error('Invalid year parameter');
         }
 
-        const res = await fetch(`https://api.argentinadatos.com/v1/feriados/${year}`, {
+        const res = await fetch(`/api/holidays/${year}`, {
           signal: controller.signal
         });
         clearTimeout(timeoutId);
@@ -231,7 +231,7 @@ export default function App() {
             <div className="flex bg-slate-100 dark:bg-slate-800/50 px-4 py-1.5 rounded-full items-center gap-3 border border-slate-200/50 dark:border-slate-700/50 shadow-sm">
               <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">BUILT WITH</span>
               <div className="h-3 w-[1px] bg-slate-200 dark:bg-slate-700" />
-              <span className="text-[9px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-tight">Vite + React + Tailwind</span>
+              <span className="text-[9px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-tight">Fastify + Vite + React + Tailwind</span>
             </div>
 
             {/* Right: API Status */}
