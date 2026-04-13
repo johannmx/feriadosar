@@ -1,11 +1,27 @@
+version: '3.8'
 
 services:
-  frontend:
+  api:
     build:
-      context: .
-      dockerfile: Dockerfile
-    image: ghcr.io/johannmx/feriadosar:latest
-    container_name: feriadosar-frontend
+      context: ./web/api
     ports:
-      - "8080:80"
-    restart: unless-stopped
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - NODE_ENV=development
+    volumes:
+      - ./web/api:/app
+      - /app/node_modules
+
+  client:
+    build:
+      context: ./web/client
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:3001
+    volumes:
+      - ./web/client:/app
+      - /app/node_modules
+    depends_on:
+      - api

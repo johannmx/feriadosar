@@ -1,10 +1,33 @@
-
 services:
-  frontend:
-    image: ghcr.io/johannmx/feriadosar:latest
+  api:
+    image: ghcr.io/johannmx/feriadosar-api:latest
+    container_name: feriadosar-api
+    environment:
+      - PORT=3001
+      - NODE_ENV=production
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  client:
+    image: ghcr.io/johannmx/feriadosar-client:latest
     container_name: feriadosar-prod
     ports:
-      - "80:80"
+      - "8086:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     restart: always
     logging:
       driver: "json-file"
