@@ -4,7 +4,6 @@
     "config:recommended",
     ":separateMajorReleases",
     ":combinePatchMinorReleases",
-    "docker:enableAll",
     "npm:unpublishSafe"
   ],
   "packageRules": [
