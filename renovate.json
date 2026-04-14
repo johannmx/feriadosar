@@ -14,7 +14,7 @@
     },
     {
       "description": "Group all development dependencies",
-      "matchPackagePatterns": ["*"],
+      "matchPackageNames": ["*"],
       "matchDepTypes": ["devDependencies"],
       "groupName": "Development Dependencies"
     }
