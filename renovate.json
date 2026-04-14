@@ -6,6 +6,7 @@
     ":combinePatchMinorReleases",
     "npm:unpublishSafe"
   ],
+  "platformAutomerge": true,
   "packageRules": [
     {
       "matchUpdateTypes": ["minor", "patch"],
