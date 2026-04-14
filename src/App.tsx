@@ -53,11 +53,21 @@ export default function App() {
         }
 
         const res = await fetch(`https://api.argentinadatos.com/v1/feriados/${year}`, {
-          signal: controller.signal
+          signal: controller.signal,
+          headers: {
+            'Accept': 'application/json'
+          }
         });
         clearTimeout(timeoutId);
 
         if (!res.ok) throw new Error('API down');
+
+        // Security Enhancement: Validate Content-Type to prevent MIME confusion
+        const contentType = res.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error('Invalid Content-Type from external API');
+        }
+
         const data = await res.json();
 
         // Security Enhancement: Validate external API input
