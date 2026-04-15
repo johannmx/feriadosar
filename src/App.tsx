@@ -1,14 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Sun, Moon, Monitor, CalendarDays, ChevronDown } from 'lucide-react';
 import { useTheme } from './hooks/useTheme';
+import { useHolidays } from './hooks/useHolidays';
 import { HolidayCard } from './components/HolidayCard';
 import { CalendarView } from './components/CalendarView';
-
-interface Holiday {
-  fecha: string;
-  tipo: string;
-  nombre: string;
-}
 
 const COLORS = [
   'bg-blue-500',
@@ -30,87 +25,10 @@ const availableYears = Array.from({ length: 11 }, (_, i) => new Date().getFullYe
 
 export default function App() {
   const { theme, setTheme } = useTheme();
-  const [holidays, setHolidays] = useState<Holiday[]>([]);
-  const [loading, setLoading] = useState(true);
   const [year, setYear] = useState(new Date().getFullYear());
+  const { holidays, loading, apiStatus } = useHolidays(year);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'feriados' | 'calendario'>('feriados');
-  const [apiStatus, setApiStatus] = useState<'checking' | 'up' | 'down'>('checking');
-
-  useEffect(() => {
-    // Security Enhancement: Add timeout to external API call
-    const controller = new AbortController();
-
-    const fetchHolidays = async () => {
-      setLoading(true);
-
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
-
-      try {
-        // Security Enhancement: Validate network request parameter to prevent path traversal/SSRF
-        if (typeof year !== 'number' || year < 2000 || year > 2100) {
-          throw new Error('Invalid year parameter');
-        }
-
-        const res = await fetch(`https://api.argentinadatos.com/v1/feriados/${year}`, {
-          signal: controller.signal,
-          headers: {
-            'Accept': 'application/json'
-          }
-        });
-        clearTimeout(timeoutId);
-
-        if (!res.ok) throw new Error('API down');
-
-        // Security Enhancement: Validate Content-Type to prevent MIME confusion
-        const contentType = res.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-          throw new Error('Invalid Content-Type from external API');
-        }
-
-        const data = await res.json();
-
-        // Security Enhancement: Validate external API input
-        if (!Array.isArray(data)) {
-          throw new Error('Invalid API response format');
-        }
-
-        // Enforce maximum length to prevent DoS via excessive DOM rendering
-        const MAX_HOLIDAYS = 100;
-        if (data.length > MAX_HOLIDAYS) {
-          throw new Error('API response too large');
-        }
-
-        // Type validate each item to ensure no malicious injection
-        // Prevent application crash (DoS) from invalid dates and limit string lengths
-        const validatedHolidays = data.filter((h: unknown) => {
-          if (!h || typeof h !== 'object') return false;
-          const item = h as Record<string, unknown>;
-          return typeof item.fecha === 'string' &&
-                 item.fecha.length === 10 &&
-                 !isNaN(new Date(item.fecha + 'T00:00:00').getTime()) &&
-                 typeof item.tipo === 'string' &&
-                 item.tipo.length <= 50 &&
-                 typeof item.nombre === 'string' &&
-                 item.nombre.length <= 255;
-        }) as Holiday[];
-
-        setHolidays(validatedHolidays);
-        setApiStatus('up');
-      } catch {
-        setApiStatus('down');
-        // Security Enhancement: Sanitize error logging to prevent leaking sensitive information
-        console.error('Error fetching holidays. External API might be down or timed out.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchHolidays();
-
-    return () => {
-      controller.abort();
-    };
-  }, [year]);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300 py-10 px-4 sm:px-6 lg:px-8 font-sans text-slate-900 pb-10 lg:pb-48 overflow-x-hidden w-full">

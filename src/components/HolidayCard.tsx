@@ -1,10 +1,8 @@
 import { Calendar } from 'lucide-react';
 import { getTodayDateString } from '../utils/dateUtils';
+import { Holiday } from '../types/holiday';
 
-interface HolidayCardProps {
-  fecha: string;
-  tipo: string;
-  nombre: string;
+interface HolidayCardProps extends Holiday {
   color: string;
 }
 
