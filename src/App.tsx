@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Sun, Moon, Monitor, CalendarDays, ChevronDown } from 'lucide-react';
 import { useTheme } from './hooks/useTheme';
 import { HolidayCard } from './components/HolidayCard';
 import { CalendarView } from './components/CalendarView';
+import { getTodayDateString } from './utils/dateUtils';
 
 interface Holiday {
   fecha: string;
@@ -36,6 +37,8 @@ export default function App() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'feriados' | 'calendario'>('feriados');
   const [apiStatus, setApiStatus] = useState<'checking' | 'up' | 'down'>('checking');
+
+  const todayStr = useMemo(() => getTodayDateString(), []);
 
   useEffect(() => {
     // Security Enhancement: Add timeout to external API call
@@ -219,6 +222,7 @@ export default function App() {
                 tipo={holiday.tipo} 
                 nombre={holiday.nombre}
                 color={COLORS[idx % COLORS.length]} 
+                isPast={holiday.fecha < todayStr}
               />
             ))}
           </div>
