@@ -48,7 +48,7 @@ export default function App() {
 
       try {
         // Security Enhancement: Validate network request parameter to prevent path traversal/SSRF
-        if (typeof year !== 'number' || year < 2000 || year > 2100) {
+        if (!Number.isSafeInteger(year) || year < 2000 || year > 2100) {
           throw new Error('Invalid year parameter');
         }
 
