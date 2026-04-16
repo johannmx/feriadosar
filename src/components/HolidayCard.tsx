@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { Calendar } from 'lucide-react';
-import { Holiday } from '../types/holiday';
+import type { Holiday } from '../types/holiday';
 
 interface HolidayCardProps extends Holiday {
   color: string;
