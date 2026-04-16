@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Sun, Moon, Monitor, CalendarDays, ChevronDown } from 'lucide-react';
 import { useTheme } from './hooks/useTheme';
 import { useHolidays } from './hooks/useHolidays';
 import { HolidayCard } from './components/HolidayCard';
 import { CalendarView } from './components/CalendarView';
+import { getTodayDateString } from './utils/dateUtils';
 
 const COLORS = [
   'bg-blue-500',
@@ -29,6 +30,7 @@ export default function App() {
   const { holidays, loading, apiStatus } = useHolidays(year);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'feriados' | 'calendario'>('feriados');
+  const todayStr = useMemo(() => getTodayDateString(), []);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300 py-10 px-4 sm:px-6 lg:px-8 font-sans text-slate-900 pb-10 lg:pb-48 overflow-x-hidden w-full">
@@ -137,6 +139,7 @@ export default function App() {
                 tipo={holiday.tipo} 
                 nombre={holiday.nombre}
                 color={COLORS[idx % COLORS.length]} 
+                isPast={holiday.fecha < todayStr}
               />
             ))}
           </div>

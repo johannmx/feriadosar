@@ -1,21 +1,20 @@
+import { memo } from 'react';
 import { Calendar } from 'lucide-react';
-import { getTodayDateString } from '../utils/dateUtils';
 import { Holiday } from '../types/holiday';
 
 interface HolidayCardProps extends Holiday {
   color: string;
+  isPast: boolean;
 }
 
-export const HolidayCard = ({ fecha, tipo, nombre, color }: HolidayCardProps) => {
+const monthFormatter = new Intl.DateTimeFormat('es-AR', { month: 'short' });
+const weekdayFormatter = new Intl.DateTimeFormat('es-AR', { weekday: 'long' });
+
+export const HolidayCard = memo(({ fecha, tipo, nombre, color, isPast }: HolidayCardProps) => {
   const dateObj = new Date(fecha + 'T00:00:00'); // Prevent timezone shift
   const day = dateObj.getDate();
-  const month = dateObj.toLocaleDateString('es-AR', { month: 'short' }).toUpperCase();
-  const weekday = dateObj.toLocaleDateString('es-AR', { weekday: 'long' });
-
-  // Use local time from env if possible, otherwise browser time
-  // Current time is 2026-03-25T15:25:47-03:00 -> en-CA formats to '2026-03-25'
-
-  const isPast = fecha < getTodayDateString();
+  const month = monthFormatter.format(dateObj).toUpperCase();
+  const weekday = weekdayFormatter.format(dateObj);
 
   return (
     <div className={`bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-md transition-all duration-300 relative overflow-hidden group h-full justify-between min-h-[200px] flex flex-col ${isPast ? 'opacity-50 grayscale hover:opacity-100 hover:grayscale-0' : ''}`}>
@@ -41,4 +40,6 @@ export const HolidayCard = ({ fecha, tipo, nombre, color }: HolidayCardProps) =>
       </div>
     </div>
   );
-};
+});
+
+HolidayCard.displayName = 'HolidayCard';
