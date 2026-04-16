@@ -1,4 +1,4 @@
-import { Holiday } from '../types/holiday';
+import type { Holiday } from '../types/holiday';
 
 const MAX_HOLIDAYS = 100;
 

@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { Holiday } from '../types/holiday';
+import type { Holiday } from '../types/holiday';
 import { fetchHolidays } from '../services/holidayService';
 
 export type ApiStatus = 'checking' | 'up' | 'down';
