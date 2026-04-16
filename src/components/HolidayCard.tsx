@@ -1,10 +1,8 @@
 import { memo } from 'react';
 import { Calendar } from 'lucide-react';
+import { Holiday } from '../types/holiday';
 
-interface HolidayCardProps {
-  fecha: string;
-  tipo: string;
-  nombre: string;
+interface HolidayCardProps extends Holiday {
   color: string;
   isPast: boolean;
 }

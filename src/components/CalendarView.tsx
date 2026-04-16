@@ -1,13 +1,6 @@
-
-
 import { useMemo } from 'react';
 import { getTodayDateString } from '../utils/dateUtils';
-
-interface Holiday {
-  fecha: string;
-  tipo: string;
-  nombre: string;
-}
+import { Holiday } from '../types/holiday';
 
 interface CalendarViewProps {
   year: number;
