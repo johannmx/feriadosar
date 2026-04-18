@@ -10,6 +10,8 @@ export const fetchHolidays = async (year: number, signal?: AbortSignal): Promise
 
   const res = await fetch(`https://api.argentinadatos.com/v1/feriados/${year}`, {
     signal,
+    credentials: 'omit',
+    redirect: 'error',
     headers: {
       'Accept': 'application/json'
     }
