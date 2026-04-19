@@ -1,18 +1,13 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { useHolidays } from './useHolidays';
 import * as holidayService from '../services/holidayService';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('../services/holidayService');
 
 describe('useHolidays', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.useFakeTimers();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
   });
 
   it('should fetch holidays and update state on success', async () => {
