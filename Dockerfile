@@ -17,7 +17,7 @@ RUN echo "server { \
     add_header X-Frame-Options \"SAMEORIGIN\" always; \
     add_header X-Content-Type-Options \"nosniff\" always; \
     add_header Referrer-Policy \"strict-origin-when-cross-origin\" always; \
-    add_header Content-Security-Policy \"default-src 'self'; script-src 'self' https://umami.johatech.ar; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.argentinadatos.com https://umami.johatech.ar; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests;\" always; \
+    add_header Content-Security-Policy \"default-src 'self'; script-src 'self' https://umami.johatech.ar; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.argentinadatos.com https://umami.johatech.ar; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests;\" always; \
     add_header Strict-Transport-Security \"max-age=31536000; includeSubDomains\" always; \
     add_header Cross-Origin-Opener-Policy \"same-origin\" always; \
     add_header Cross-Origin-Resource-Policy \"same-origin\" always; \
