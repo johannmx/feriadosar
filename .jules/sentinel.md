@@ -61,3 +61,8 @@
 **Vulnerability:** The NGINX Content-Security-Policy header in the `Dockerfile` included `'unsafe-inline'` in the `style-src` directive, weakening defense against CSS Injection. CSS Injection can be used to alter the visual appearance of a page, steal sensitive data, or perform clickjacking.
 **Learning:** Even if inline styles are not used intentionally by developers, allowing them through CSP leaves the application vulnerable to malicious CSS injection if user input is reflected in the DOM without proper sanitization.
 **Prevention:** Always remove `'unsafe-inline'` from CSP `style-src` unless absolutely required and explicitly document why. If inline styles are needed, prefer using CSS classes instead, or consider using nonces or hashes if inline styles are strictly required.
+
+## 2026-04-21 - [Strict Schema and XSS Prevention on API Boundary]
+**Vulnerability:** While external API strings were checked for length and type, their contents were not strictly validated. The `fecha` property could contain malformed but parsable date fragments, and the `nombre`/`tipo` properties could potentially contain HTML characters (`<`, `>`). If the UI layer's XSS protections ever failed or if data was serialized unsafely, this would open a Cross-Site Scripting (XSS) vulnerability.
+**Learning:** Defense-in-depth requires establishing strict schemas at trust boundaries. String length validation alone is insufficient if the string's content can still carry malicious payloads or unexpected formats.
+**Prevention:** Always enforce strict format validation (like `^\d{4}-\d{2}-\d{2}$` for dates) and explicit character rejection (like `!/[<>]/.test(str)`) at the immediate boundary where external data enters the application state.
