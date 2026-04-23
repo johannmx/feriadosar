@@ -43,12 +43,14 @@ export const fetchHolidays = async (year: number, signal?: AbortSignal): Promise
     if (!h || typeof h !== 'object') return false;
     const item = h as Record<string, unknown>;
     return typeof item.fecha === 'string' &&
-           item.fecha.length === 10 &&
+           /^\d{4}-\d{2}-\d{2}$/.test(item.fecha) &&
            !isNaN(new Date(item.fecha + 'T00:00:00').getTime()) &&
            typeof item.tipo === 'string' &&
            item.tipo.length <= 50 &&
+           !/[<>]/.test(item.tipo) &&
            typeof item.nombre === 'string' &&
-           item.nombre.length <= 255;
+           item.nombre.length <= 255 &&
+           !/[<>]/.test(item.nombre);
   }) as Holiday[];
 
   return validatedHolidays;
