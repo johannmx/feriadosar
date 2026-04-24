@@ -61,3 +61,8 @@
 **Vulnerability:** The NGINX Content-Security-Policy header in the `Dockerfile` included `'unsafe-inline'` in the `style-src` directive, weakening defense against CSS Injection. CSS Injection can be used to alter the visual appearance of a page, steal sensitive data, or perform clickjacking.
 **Learning:** Even if inline styles are not used intentionally by developers, allowing them through CSP leaves the application vulnerable to malicious CSS injection if user input is reflected in the DOM without proper sanitization.
 **Prevention:** Always remove `'unsafe-inline'` from CSP `style-src` unless absolutely required and explicitly document why. If inline styles are needed, prefer using CSS classes instead, or consider using nonces or hashes if inline styles are strictly required.
+
+## 2026-04-21 - [Implement strict payload validation in holidayService]
+**Vulnerability:** The external API response for holiday entries was mapping properties (e.g., string types, lengths) directly, but it missed format verification (like enforcing exact YYYY-MM-DD for date string payloads) and allowed all characters (including raw `<>` tags) in text fields. While it was length-bound, it allowed structural malformation and possible XSS entry points.
+**Learning:** Checking the basic type and length is a start, but text and formatted data elements from external APIs should adhere to their explicit logical formats and sanitize dangerous characters as a defense in depth against XSS and logic errors further down the render tree.
+**Prevention:** Constrain structured data to its expected format via Regex (e.g. date format `^\d{4}-\d{2}-\d{2}$`) and sanitize text elements against potentially malicious string inclusions like `<` and `>`.
