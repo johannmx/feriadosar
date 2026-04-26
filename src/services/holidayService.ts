@@ -38,17 +38,24 @@ export const fetchHolidays = async (year: number, signal?: AbortSignal): Promise
   }
 
   // Type validate each item to ensure no malicious injection
-  // Prevent application crash (DoS) from invalid dates and limit string lengths
+  // Prevent application crash (DoS) from invalid dates, limit string lengths, and block HTML injection
   const validatedHolidays = data.filter((h: unknown) => {
     if (!h || typeof h !== 'object') return false;
     const item = h as Record<string, unknown>;
-    return typeof item.fecha === 'string' &&
-           item.fecha.length === 10 &&
-           !isNaN(new Date(item.fecha + 'T00:00:00').getTime()) &&
-           typeof item.tipo === 'string' &&
-           item.tipo.length <= 50 &&
-           typeof item.nombre === 'string' &&
-           item.nombre.length <= 255;
+
+    const isValidDate = typeof item.fecha === 'string' &&
+                        /^\d{4}-\d{2}-\d{2}$/.test(item.fecha) &&
+                        !isNaN(new Date(item.fecha + 'T00:00:00').getTime());
+
+    const isValidTipo = typeof item.tipo === 'string' &&
+                        item.tipo.length <= 50 &&
+                        !/[<>]/.test(item.tipo);
+
+    const isValidNombre = typeof item.nombre === 'string' &&
+                          item.nombre.length <= 255 &&
+                          !/[<>]/.test(item.nombre);
+
+    return isValidDate && isValidTipo && isValidNombre;
   }) as Holiday[];
 
   return validatedHolidays;
