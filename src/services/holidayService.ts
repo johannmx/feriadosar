@@ -25,6 +25,16 @@ export const fetchHolidays = async (year: number, signal?: AbortSignal): Promise
     throw new Error('Invalid Content-Type from external API');
   }
 
+  // Security Enhancement: Validate Content-Length to prevent Client-Side DoS via massive payload memory exhaustion
+  const contentLengthStr = res.headers.get('content-length');
+  if (contentLengthStr) {
+    const contentLength = parseInt(contentLengthStr, 10);
+    // 50KB is more than enough for a year's worth of JSON holiday data
+    if (!Number.isNaN(contentLength) && contentLength > 50000) {
+      throw new Error('API response too large (Content-Length exceeds limits)');
+    }
+  }
+
   const data = await res.json();
 
   // Security Enhancement: Validate external API input
