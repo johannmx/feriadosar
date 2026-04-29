@@ -12,6 +12,7 @@ export const fetchHolidays = async (year: number, signal?: AbortSignal): Promise
     signal,
     credentials: 'omit',
     redirect: 'error',
+    referrerPolicy: 'no-referrer', // Security Enhancement: Prevent leaking application URL
     headers: {
       'Accept': 'application/json'
     }
@@ -29,9 +30,9 @@ export const fetchHolidays = async (year: number, signal?: AbortSignal): Promise
   const contentLengthStr = res.headers.get('content-length');
   if (contentLengthStr) {
     const contentLength = parseInt(contentLengthStr, 10);
-    // 50KB is more than enough for a year's worth of JSON holiday data
-    if (!Number.isNaN(contentLength) && contentLength > 50000) {
-      throw new Error('API response too large (Content-Length exceeds limits)');
+    // 50KB is more than enough for a year's worth of JSON holiday data. Fail securely if length is NaN.
+    if (Number.isNaN(contentLength) || contentLength > 50000) {
+      throw new Error('API response too large (Content-Length exceeds limits or is invalid)');
     }
   }
 
