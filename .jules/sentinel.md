@@ -71,3 +71,8 @@
 **Vulnerability:** The application blindly called `res.json()` on the external API response. If the external API were compromised and returned an unbounded massive payload, `res.json()` would attempt to load and parse the entire payload into client memory. This could crash the browser tab due to memory exhaustion (Client-Side DoS).
 **Learning:** Relying purely on DOM/Array limits after data parsing (e.g. `data.length > MAX_HOLIDAYS`) is insufficient defense. Memory exhaustion vulnerabilities occur during the deserialization (`res.json()`) step itself.
 **Prevention:** Always validate the `Content-Length` header (if present) before invoking memory-intensive parser functions like `res.json()` or `res.text()` when fetching external data.
+
+## 2026-04-29 - [Fix DoS Protection Bypass in Content-Length Validation]
+**Vulnerability:** The `Content-Length` validation logic checked `!Number.isNaN(contentLength) && contentLength > 50000`. If an attacker provided a malformed `Content-Length` header that parsed to `NaN`, the check evaluated to `false`, bypassing the 50KB limit. This could allow a massive payload to be passed to `res.json()`, causing memory exhaustion and a Client-Side DoS.
+**Learning:** When enforcing security boundaries based on parsed values, you must fail securely on invalid parser outputs. Using `!NaN && condition` causes the entire check to fail implicitly, opening a bypass.
+**Prevention:** Always check for invalid values (like `NaN`) explicitly and fail securely (e.g., `Number.isNaN(contentLength) || contentLength > 50000`).
