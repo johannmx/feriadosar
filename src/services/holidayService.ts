@@ -26,17 +26,41 @@ export const fetchHolidays = async (year: number, signal?: AbortSignal): Promise
     throw new Error('Invalid Content-Type from external API');
   }
 
-  // Security Enhancement: Validate Content-Length to prevent Client-Side DoS via massive payload memory exhaustion
-  const contentLengthStr = res.headers.get('content-length');
-  if (contentLengthStr) {
-    const contentLength = parseInt(contentLengthStr, 10);
-    // 50KB is more than enough for a year's worth of JSON holiday data. Fail securely if length is NaN.
-    if (Number.isNaN(contentLength) || contentLength > 50000) {
-      throw new Error('API response too large (Content-Length exceeds limits or is invalid)');
+  // Security Enhancement: Use stream reader with a hard 50KB limit to prevent Client-Side DoS
+  // via memory exhaustion, even if Content-Length is missing or spoofed.
+  const reader = res.body?.getReader();
+  if (!reader) {
+    throw new Error('ReadableStream not supported or missing');
+  }
+
+  let receivedLength = 0;
+  const chunks: Uint8Array[] = [];
+  const MAX_BYTES = 50000;
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    if (value) {
+      receivedLength += value.length;
+      if (receivedLength > MAX_BYTES) {
+        reader.cancel();
+        throw new Error('API response too large (Stream exceeded max bytes limit)');
+      }
+      chunks.push(value);
     }
   }
 
-  const data = await res.json();
+  const chunksAll = new Uint8Array(receivedLength);
+  let position = 0;
+  for (const chunk of chunks) {
+    chunksAll.set(chunk, position);
+    position += chunk.length;
+  }
+
+  const textDecoder = new TextDecoder('utf-8');
+  const responseText = textDecoder.decode(chunksAll);
+  const data = JSON.parse(responseText);
 
   // Security Enhancement: Validate external API input
   if (!Array.isArray(data)) {
