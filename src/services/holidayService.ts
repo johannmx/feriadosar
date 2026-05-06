@@ -91,7 +91,13 @@ export const fetchHolidays = async (year: number, signal?: AbortSignal): Promise
                           !/[<>]/.test(item.nombre);
 
     return isValidDate && isValidTipo && isValidNombre;
-  }) as Holiday[];
+  }).map((item) => ({
+    // Security Enhancement: Explicitly map only expected properties to prevent
+    // prototype pollution or carrying over unexpected/malicious data from API.
+    fecha: (item as Holiday).fecha,
+    tipo: (item as Holiday).tipo,
+    nombre: (item as Holiday).nombre
+  })) as Holiday[];
 
   return validatedHolidays;
 };
