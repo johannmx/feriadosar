@@ -58,7 +58,7 @@ export const fetchHolidays = async (year: number, signal?: AbortSignal): Promise
     position += chunk.length;
   }
 
-  const textDecoder = new TextDecoder('utf-8');
+  const textDecoder = new TextDecoder('utf-8', { fatal: true });
   const responseText = textDecoder.decode(chunksAll);
   const data = JSON.parse(responseText);
 
