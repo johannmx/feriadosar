@@ -7,12 +7,12 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM nginx:stable
+FROM nginxinc/nginx-unprivileged:stable-alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 # Copy custom nginx config if we had one, but default is fine for simple SPA if we add SPA routing.
 # To support React Router (if used), we'd need a custom nginx.conf or simply replace the default.conf
 RUN echo "server { \
-    listen 80; \
+    listen 8080; \
     server_tokens off; \
     add_header X-Frame-Options \"SAMEORIGIN\" always; \
     add_header X-Content-Type-Options \"nosniff\" always; \
@@ -29,5 +29,5 @@ RUN echo "server { \
     } \
 }" > /etc/nginx/conf.d/default.conf
 
-EXPOSE 80
+EXPOSE 8080
 CMD ["nginx", "-g", "daemon off;"]

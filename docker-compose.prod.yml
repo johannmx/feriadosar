@@ -4,7 +4,7 @@ services:
     image: ghcr.io/johannmx/feriadosar:latest
     container_name: feriadosar-prod
     ports:
-      - "80:80"
+      - "80:8080"
     restart: always
     logging:
       driver: "json-file"
