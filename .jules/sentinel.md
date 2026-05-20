@@ -105,3 +105,8 @@
 **Vulnerability:** The external tracking script (`https://umami.johatech.ar/script.js`) was loaded without Subresource Integrity (SRI) validation. If the third-party analytics server were compromised and the script modified to include malicious code, the application would blindly execute it, leading to a supply-chain Cross-Site Scripting (XSS) vulnerability.
 **Learning:** Loading third-party scripts without integrity checks creates a massive blind spot in application security. Relying solely on `crossorigin="anonymous"` protects credentials but does not guarantee the script's contents remain benign.
 **Prevention:** Always include the `integrity` attribute with a cryptographic hash (e.g., `sha384-...`) on external `<script>` tags to ensure the browser strictly verifies the fetched resource matches the expected hash before execution.
+
+## 2026-05-18 - [Run NGINX as Non-Root Unprivileged User]
+**Vulnerability:** Running NGINX as the default root user in a Docker container violates the principle of least privilege. If an attacker exploits a vulnerability in NGINX or a web application component, they gain root access within the container, making it easier to attempt container breakouts or interact with the host system.
+**Learning:** Default base images often run services as root. Proactively switching to an unprivileged variant significantly limits the blast radius of any potential compromise by ensuring the process only has access to explicitly required resources.
+**Prevention:** Instead of using `nginx:stable`, use `nginxinc/nginx-unprivileged:stable-alpine` which runs the NGINX process as a non-root user (UID 101). Update port mappings to bind to non-privileged ports (e.g., 8080 instead of 80) inside the container.
