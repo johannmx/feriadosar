@@ -60,8 +60,15 @@ export const fetchHolidays = async (year: number, signal?: AbortSignal): Promise
 
   // Security Enhancement: Fail securely on invalid UTF-8 instead of silently substituting characters
   const textDecoder = new TextDecoder('utf-8', { fatal: true });
-  const responseText = textDecoder.decode(chunksAll);
-  const data = JSON.parse(responseText);
+  let data: unknown;
+
+  try {
+    const responseText = textDecoder.decode(chunksAll);
+    data = JSON.parse(responseText);
+  } catch (error) {
+    // Security Enhancement: Do not leak stack traces or payload snippets via parsing errors
+    throw new Error('Failed to securely parse API response data');
+  }
 
   // Security Enhancement: Validate external API input
   if (!Array.isArray(data)) {
