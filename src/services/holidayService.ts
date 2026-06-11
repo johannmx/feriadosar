@@ -64,8 +64,14 @@ export const fetchHolidays = async (year: number, signal?: AbortSignal): Promise
 
   try {
     const responseText = textDecoder.decode(chunksAll);
-    data = JSON.parse(responseText);
-  } catch (error) {
+    // Security Enhancement: Strip dangerous keys during deserialization
+    data = JSON.parse(responseText, (key, value) => {
+      if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+        return undefined; // Drop dangerous properties
+      }
+      return value;
+    });
+  } catch {
     // Security Enhancement: Do not leak stack traces or payload snippets via parsing errors
     throw new Error('Failed to securely parse API response data');
   }
