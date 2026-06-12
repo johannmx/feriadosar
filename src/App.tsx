@@ -24,6 +24,19 @@ const LEGEND_ITEMS = [
 
 const availableYears = Array.from({ length: 11 }, (_, i) => new Date().getFullYear() + 1 - i);
 
+const monthFormatter = new Intl.DateTimeFormat('es-AR', { month: 'long' });
+const weekdayFormatter = new Intl.DateTimeFormat('es-AR', { weekday: 'long' });
+
+const formatHolidayDate = (fechaStr: string) => {
+  const dateObj = new Date(fechaStr + 'T00:00:00');
+  const weekday = weekdayFormatter.format(dateObj);
+  const day = dateObj.getDate();
+  const month = monthFormatter.format(dateObj);
+  const capitalizedWeekday = weekday.charAt(0).toUpperCase() + weekday.slice(1);
+  return `${capitalizedWeekday} ${day} de ${month}`;
+};
+
+
 export default function App() {
   const { theme, setTheme } = useTheme();
   const [year, setYear] = useState(new Date().getFullYear());
@@ -31,6 +44,20 @@ export default function App() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'feriados' | 'calendario'>('feriados');
   const todayStr = useMemo(() => getTodayDateString(), []);
+
+  const nextHoliday = useMemo(() => {
+    if (!holidays.length) return null;
+    return holidays.find((h) => h.fecha >= todayStr);
+  }, [holidays, todayStr]);
+
+  const daysRemaining = useMemo(() => {
+    if (!nextHoliday) return null;
+    const today = new Date(todayStr + 'T00:00:00');
+    const holidayDate = new Date(nextHoliday.fecha + 'T00:00:00');
+    const diffTime = holidayDate.getTime() - today.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  }, [nextHoliday, todayStr]);
+
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300 py-10 px-4 sm:px-6 lg:px-8 font-sans text-slate-900 pb-10 lg:pb-48 overflow-x-hidden w-full">
@@ -113,6 +140,40 @@ export default function App() {
             Calendario
           </button>
         </div>
+
+        {/* PROXIMO FERIADO MOBILE BANNER */}
+        {!loading && nextHoliday && (
+          <div className="block sm:hidden mb-8 px-4 py-4 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 dark:from-blue-500/20 dark:to-indigo-500/20 border border-blue-100 dark:border-blue-900/50 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
+            <div className="flex items-start gap-3.5">
+              <div className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white p-2.5 rounded-xl shadow-md shrink-0">
+                <CalendarDays className="w-5 h-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400">
+                    Próximo Feriado
+                  </span>
+                  {daysRemaining !== null && (
+                    <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300">
+                      {daysRemaining === 0 
+                        ? '¡Es hoy!' 
+                        : daysRemaining === 1 
+                        ? 'Mañana' 
+                        : `Faltan ${daysRemaining} días`}
+                    </span>
+                  )}
+                </div>
+                <h4 className="text-sm font-black text-slate-800 dark:text-white truncate mt-1">
+                  {nextHoliday.nombre}
+                </h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                  {formatHolidayDate(nextHoliday.fecha)}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
 
         {/* LEGEND (Only for Calendar View) */}
         {!loading && activeTab === 'calendario' && (
