@@ -163,7 +163,7 @@ export default function App() {
                     </span>
                   )}
                 </div>
-                <h4 className="text-sm font-black text-slate-800 dark:text-white truncate mt-1">
+                <h4 className="text-sm font-black text-slate-800 dark:text-white mt-1">
                   {nextHoliday.nombre}
                 </h4>
                 <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
