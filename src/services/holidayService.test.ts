@@ -14,7 +14,7 @@ describe('holidayService', () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue({
       ok: true,
       headers: new Headers({ 'content-type': 'application/json' }),
-      json: async () => mockHolidays,
+      text: async () => JSON.stringify(mockHolidays),
     } as Response);
 
     // First fetch: should call the API
