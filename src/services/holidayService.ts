@@ -34,7 +34,19 @@ export const fetchHolidays = async (year: number, signal?: AbortSignal): Promise
     throw new Error('Invalid Content-Type from external API');
   }
 
-  const data = await res.json();
+  let data;
+  try {
+    const rawText = await res.text();
+    // Use reviver to prevent prototype pollution during deserialization
+    data = JSON.parse(rawText, (key, value) => {
+      if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+        return undefined; // Drop dangerous keys
+      }
+      return value;
+    });
+  } catch {
+    throw new Error('Failed to securely parse API response');
+  }
 
   // Security Enhancement: Validate external API input
   if (!Array.isArray(data)) {
@@ -46,19 +58,29 @@ export const fetchHolidays = async (year: number, signal?: AbortSignal): Promise
     throw new Error('API response too large');
   }
 
-  // Type validate each item to ensure no malicious injection
-  // Prevent application crash (DoS) from invalid dates and limit string lengths
-  const validatedHolidays = data.filter((h: unknown) => {
-    if (!h || typeof h !== 'object') return false;
+  // Explicitly map properties to avoid implicit typecasting and dropped properties bypass
+  const validatedHolidays = data.reduce((acc: Holiday[], h: unknown) => {
+    if (!h || typeof h !== 'object') return acc;
     const item = h as Record<string, unknown>;
-    return typeof item.fecha === 'string' &&
-           item.fecha.length === 10 &&
-           !isNaN(new Date(item.fecha + 'T00:00:00').getTime()) &&
-           typeof item.tipo === 'string' &&
-           item.tipo.length <= 50 &&
-           typeof item.nombre === 'string' &&
-           item.nombre.length <= 255;
-  }) as Holiday[];
+
+    // Validate required types and constraints
+    if (typeof item.fecha === 'string' &&
+        item.fecha.length === 10 &&
+        !isNaN(new Date(item.fecha + 'T00:00:00').getTime()) &&
+        typeof item.tipo === 'string' &&
+        item.tipo.length <= 50 &&
+        typeof item.nombre === 'string' &&
+        item.nombre.length <= 255) {
+
+      // Map exclusively the expected properties
+      acc.push({
+        fecha: item.fecha,
+        tipo: item.tipo,
+        nombre: item.nombre
+      });
+    }
+    return acc;
+  }, []);
 
   // Cache the successfully validated holidays
   holidayCache.set(year, validatedHolidays);
