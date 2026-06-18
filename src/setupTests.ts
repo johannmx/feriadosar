@@ -1,53 +1,45 @@
 import '@testing-library/jest-dom/vitest';
 
-class MockStorage implements Storage {
-  private store: Record<string, string> = {};
+// Fix Node 22/25+ native localStorage and sessionStorage shadowing JSDOM issue
+const createStorageMock = () => {
+  let store: Record<string, string> = {};
+  return {
+    getItem: (key: string) => store[key] || null,
+    setItem: (key: string, value: string) => {
+      store[key] = String(value);
+    },
+    clear: () => {
+      store = {};
+    },
+    removeItem: (key: string) => {
+      delete store[key];
+    },
+    get length() {
+      return Object.keys(store).length;
+    },
+    key: (index: number) => Object.keys(store)[index] || null,
+  };
+};
 
-  get length(): number {
-    return Object.keys(this.store).length;
-  }
+const localStorageMock = createStorageMock();
+const sessionStorageMock = createStorageMock();
 
-  clear(): void {
-    this.store = {};
-  }
-
-  getItem(key: string): string | null {
-    return key in this.store ? this.store[key] : null;
-  }
-
-  key(index: number): string | null {
-    const keys = Object.keys(this.store);
-    return index >= 0 && index < keys.length ? keys[index] : null;
-  }
-
-  removeItem(key: string): void {
-    delete this.store[key];
-  }
-
-  setItem(key: string, value: string): void {
-    this.store[key] = String(value);
-  }
-}
-
-const mockLocalStorage = new MockStorage();
-const mockSessionStorage = new MockStorage();
-
-try {
-  // Delete native Node 24+ globalStorage properties to allow overriding
-  delete (globalThis as unknown as Record<string, unknown>).localStorage;
-  delete (globalThis as unknown as Record<string, unknown>).sessionStorage;
-} catch {
-  // Ignore
-}
+Object.defineProperty(window, 'localStorage', {
+  value: localStorageMock,
+  configurable: true,
+});
 
 Object.defineProperty(globalThis, 'localStorage', {
-  value: mockLocalStorage,
-  writable: true,
-  configurable: true
+  value: localStorageMock,
+  configurable: true,
+});
+
+Object.defineProperty(window, 'sessionStorage', {
+  value: sessionStorageMock,
+  configurable: true,
 });
 
 Object.defineProperty(globalThis, 'sessionStorage', {
-  value: mockSessionStorage,
-  writable: true,
-  configurable: true
+  value: sessionStorageMock,
+  configurable: true,
 });

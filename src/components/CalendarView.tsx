@@ -23,23 +23,37 @@ export const CalendarView = ({ year, holidays }: CalendarViewProps) => {
   // Use local time matching Argentina
   const todayStr = getTodayDateString();
 
+  // Precompute calendar months data (days in month, offsets, etc.) to prevent creating
+  // multiple Date objects and arrays on every render (e.g. on theme toggles)
+  const monthsData = useMemo(() => {
+    return MONTHS.map((monthName, mIdx) => {
+      const daysInMonth = new Date(year, mIdx + 1, 0).getDate();
+      const firstOfMonth = new Date(year, mIdx, 1);
+
+      // firstDay index: 0 is Monday ... 6 is Sunday
+      let firstDay = firstOfMonth.getDay() - 1;
+      if (firstDay === -1) firstDay = 6;
+
+      // 0 (Sun) to 6 (Sat)
+      const startDayOfWeek = firstOfMonth.getDay();
+      const monthStr = String(mIdx + 1).padStart(2, '0');
+      const datePrefix = `${year}-${monthStr}-`;
+
+      const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+
+      return {
+        monthName,
+        firstDay,
+        startDayOfWeek,
+        datePrefix,
+        days,
+      };
+    });
+  }, [year]);
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-      {MONTHS.map((monthName, mIdx) => {
-        const daysInMonth = new Date(year, mIdx + 1, 0).getDate();
-        const firstOfMonth = new Date(year, mIdx, 1);
-
-        // firstDay index: 0 is Monday ... 6 is Sunday
-        let firstDay = firstOfMonth.getDay() - 1;
-        if (firstDay === -1) firstDay = 6;
-
-        // 0 (Sun) to 6 (Sat)
-        const startDayOfWeek = firstOfMonth.getDay();
-        const monthStr = String(mIdx + 1).padStart(2, '0');
-        const datePrefix = `${year}-${monthStr}-`;
-
-        const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
-
+      {monthsData.map(({ monthName, firstDay, startDayOfWeek, datePrefix, days }) => {
         return (
           <div key={monthName} className="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md transition-shadow">
             <h3 className="text-lg font-black tracking-tight text-slate-800 dark:text-white uppercase mb-4 text-center">{monthName}</h3>
