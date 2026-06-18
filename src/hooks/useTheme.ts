@@ -5,7 +5,7 @@ export function useTheme() {
     // Security Enhancement: Validate localStorage input to prevent DOM injection via classList
     // Also gracefully handle SecurityError when localStorage is blocked by browser privacy settings
     try {
-      const storedTheme = localStorage.getItem('theme');
+      const storedTheme = window.localStorage.getItem('theme');
       if (storedTheme === 'light' || storedTheme === 'dark' || storedTheme === 'system') {
         return storedTheme;
       }
@@ -26,7 +26,7 @@ export function useTheme() {
     
     root.classList.add(activeTheme);
     try {
-      localStorage.setItem('theme', theme);
+      window.localStorage.setItem('theme', theme);
     } catch {
       // Ignore error to fail securely without crashing the app
     }

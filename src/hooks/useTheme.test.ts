@@ -6,7 +6,7 @@ describe('useTheme', () => {
 
   beforeEach(() => {
     // Clear localStorage and document state
-    localStorage.clear();
+    window.localStorage.clear();
     document.documentElement.className = '';
 
     // Remove injected meta tags
@@ -43,7 +43,7 @@ describe('useTheme', () => {
   });
 
   it('should initialize with theme from localStorage if available', () => {
-    localStorage.setItem('theme', 'dark');
+    window.localStorage.setItem('theme', 'dark');
     const { result } = renderHook(() => useTheme());
 
     expect(result.current.theme).toBe('dark');
@@ -51,7 +51,7 @@ describe('useTheme', () => {
   });
 
   it('should fallback to system theme if localStorage has invalid value', () => {
-    localStorage.setItem('theme', 'invalid-theme');
+    window.localStorage.setItem('theme', 'invalid-theme');
     const { result } = renderHook(() => useTheme());
 
     expect(result.current.theme).toBe('system');
@@ -67,7 +67,7 @@ describe('useTheme', () => {
     expect(result.current.theme).toBe('dark');
     expect(document.documentElement.classList.contains('dark')).toBe(true);
     expect(document.documentElement.classList.contains('light')).toBe(false);
-    expect(localStorage.getItem('theme')).toBe('dark');
+    expect(window.localStorage.getItem('theme')).toBe('dark');
   });
 
   it('should evaluate system preference properly when system theme is active', () => {

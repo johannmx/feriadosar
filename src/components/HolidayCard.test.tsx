@@ -20,7 +20,7 @@ describe('HolidayCard', () => {
 
     // Check date formatting (May 25th)
     expect(screen.getByText('25')).toBeInTheDocument();
-    expect(screen.getByText('MAY.')).toBeInTheDocument(); // short month in Spanish es-AR uppercase often includes a dot depending on environment, but based on my manual test it was 'MAY.' or 'MAY'
+    expect(screen.getByText(/^MAY\.?$/i)).toBeInTheDocument(); // short month in Spanish es-AR uppercase often includes a dot depending on environment, but based on my manual test it was 'MAY.' or 'MAY'
     expect(screen.getByText('sábado')).toBeInTheDocument(); // 2024-05-25 is Saturday
 
     const colorDivs = document.getElementsByClassName('bg-blue-500');

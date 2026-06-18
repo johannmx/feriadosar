@@ -25,7 +25,7 @@ export function useHolidays(year: number) {
           setHolidays(validatedHolidays);
           setApiStatus('up');
         }
-      } catch (error) {
+      } catch {
         if (isMounted.current) {
           setApiStatus('down');
           console.error('Error fetching holidays. External API might be down or timed out.');
