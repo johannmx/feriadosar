@@ -37,7 +37,40 @@ export const fetchHolidays = (year: number, signal?: AbortSignal): Promise<Holid
 
     let data;
     try {
-      const rawText = await res.text();
+      const reader = res.body?.getReader();
+      if (!reader) {
+        throw new Error('ReadableStream not supported or missing');
+      }
+
+      let receivedLength = 0;
+      const chunks: Uint8Array[] = [];
+      const MAX_BYTES = 50000;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        if (value) {
+          receivedLength += value.length;
+          if (receivedLength > MAX_BYTES) {
+            await reader.cancel();
+            throw new Error('API response too large');
+          }
+          chunks.push(value);
+        }
+      }
+
+      const chunksAll = new Uint8Array(receivedLength);
+      let position = 0;
+      for (const chunk of chunks) {
+        chunksAll.set(chunk, position);
+        position += chunk.length;
+      }
+
+      // Securely Parse UTF-8 Stream with TextDecoder (fatal: true)
+      const textDecoder = new TextDecoder('utf-8', { fatal: true });
+      const rawText = textDecoder.decode(chunksAll);
+
       // Use reviver to prevent prototype pollution during deserialization
       data = JSON.parse(rawText, (key, value) => {
         if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
@@ -45,7 +78,10 @@ export const fetchHolidays = (year: number, signal?: AbortSignal): Promise<Holid
         }
         return value;
       });
-    } catch {
+    } catch (err) {
+      if (err instanceof Error && err.message === 'API response too large') {
+        throw err;
+      }
       throw new Error('Failed to securely parse API response');
     }
 
