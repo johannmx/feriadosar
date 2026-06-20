@@ -58,6 +58,11 @@ export default function App() {
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }, [nextHoliday, todayStr]);
 
+  const formattedNextHolidayDate = useMemo(() => {
+    if (!nextHoliday) return '';
+    return formatHolidayDate(nextHoliday.fecha);
+  }, [nextHoliday]);
+
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300 py-10 px-4 sm:px-6 lg:px-8 font-sans text-slate-900 pb-10 lg:pb-48 overflow-x-hidden w-full">
@@ -167,7 +172,7 @@ export default function App() {
                   {nextHoliday.nombre}
                 </h4>
                 <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
-                  {formatHolidayDate(nextHoliday.fecha)}
+                  {formattedNextHolidayDate}
                 </p>
               </div>
             </div>
@@ -205,7 +210,7 @@ export default function App() {
             ))}
           </div>
         ) : (
-          <CalendarView year={year} holidays={holidays} />
+          <CalendarView year={year} holidays={holidays} todayStr={todayStr} />
         )}
 
         {/* FOOTER FIXED - EFECTO BLUR / GLASSMORPHISM */}
