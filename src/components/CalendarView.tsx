@@ -1,10 +1,10 @@
-import { useMemo } from 'react';
-import { getTodayDateString } from '../utils/dateUtils';
+import { useMemo, memo } from 'react';
 import type { Holiday } from '../types/holiday';
 
 interface CalendarViewProps {
   year: number;
   holidays: Holiday[];
+  todayStr: string;
 }
 
 const MONTHS = [
@@ -12,20 +12,13 @@ const MONTHS = [
   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
 ];
 
-export const CalendarView = ({ year, holidays }: CalendarViewProps) => {
-  // Map from "YYYY-MM-DD" to holiday object
-  const holidayMap = useMemo(() => {
-    const map = new Map<string, Holiday>();
-    holidays.forEach(h => map.set(h.fecha, h));
-    return map;
-  }, [holidays]);
-
-  // Use local time matching Argentina
-  const todayStr = getTodayDateString();
-
-  // Precompute calendar months data (days in month, offsets, etc.) to prevent creating
-  // multiple Date objects and arrays on every render (e.g. on theme toggles)
+export const CalendarView = memo(({ year, holidays, todayStr }: CalendarViewProps) => {
+  // Precompute calendar months data (days in month, offsets, styles, holidays) to prevent creating
+  // multiple Date objects, Arrays, and running layout logic on every render (e.g. during theme toggles)
   const monthsData = useMemo(() => {
+    const holidayMap = new Map<string, Holiday>();
+    holidays.forEach(h => holidayMap.set(h.fecha, h));
+
     return MONTHS.map((monthName, mIdx) => {
       const daysInMonth = new Date(year, mIdx + 1, 0).getDate();
       const firstOfMonth = new Date(year, mIdx, 1);
@@ -39,21 +32,51 @@ export const CalendarView = ({ year, holidays }: CalendarViewProps) => {
       const monthStr = String(mIdx + 1).padStart(2, '0');
       const datePrefix = `${year}-${monthStr}-`;
 
-      const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+      const days = Array.from({ length: daysInMonth }, (_, i) => {
+        const day = i + 1;
+        const dateStr = `${datePrefix}${day < 10 ? '0' : ''}${day}`;
+        const holiday = holidayMap.get(dateStr);
+
+        const dayOfWeek = (startDayOfWeek + i) % 7;
+        const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+        const isToday = dateStr === todayStr;
+
+        let colorClasses = "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50";
+        
+        if (holiday) {
+          if (holiday.tipo === "inamovible") {
+            colorClasses = "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-400 font-bold hover:bg-orange-200 dark:hover:bg-orange-900/60";
+          } else if (holiday.tipo === "trasladable") {
+            colorClasses = "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400 font-bold hover:bg-blue-200 dark:hover:bg-blue-900/60";
+          } else if (holiday.tipo === "puente") {
+            colorClasses = "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400 font-bold hover:bg-green-200 dark:hover:bg-green-900/60";
+          } else {
+            colorClasses = "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-400 font-bold hover:bg-purple-200 dark:hover:bg-purple-900/60";
+          }
+        } else if (isWeekend) {
+          colorClasses = "text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-800/50";
+        }
+
+        return {
+          day,
+          dateStr,
+          holiday,
+          isToday,
+          colorClasses,
+        };
+      });
 
       return {
         monthName,
         firstDay,
-        startDayOfWeek,
-        datePrefix,
         days,
       };
     });
-  }, [year]);
+  }, [year, holidays, todayStr]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-      {monthsData.map(({ monthName, firstDay, startDayOfWeek, datePrefix, days }) => {
+      {monthsData.map(({ monthName, firstDay, days }) => {
         return (
           <div key={monthName} className="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md transition-shadow">
             <h3 className="text-lg font-black tracking-tight text-slate-800 dark:text-white uppercase mb-4 text-center">{monthName}</h3>
@@ -67,30 +90,7 @@ export const CalendarView = ({ year, holidays }: CalendarViewProps) => {
             <div className="grid grid-cols-7 gap-1 text-center">
               {[...Array(firstDay)].map((_, i) => <div key={`empty-${i}`} />)}
               
-              {days.map(day => {
-                const dateStr = `${datePrefix}${day < 10 ? '0' : ''}${day}`;
-                const holiday = holidayMap.get(dateStr);
-
-                const dayOfWeek = (startDayOfWeek + (day - 1)) % 7;
-                const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-                const isToday = dateStr === todayStr;
-
-                let colorClasses = "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50";
-                
-                if (holiday) {
-                  if (holiday.tipo === "inamovible") {
-                    colorClasses = "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-400 font-bold hover:bg-orange-200 dark:hover:bg-orange-900/60";
-                  } else if (holiday.tipo === "trasladable") {
-                    colorClasses = "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400 font-bold hover:bg-blue-200 dark:hover:bg-blue-900/60";
-                  } else if (holiday.tipo === "puente") {
-                    colorClasses = "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400 font-bold hover:bg-green-200 dark:hover:bg-green-900/60";
-                  } else {
-                    colorClasses = "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-400 font-bold hover:bg-purple-200 dark:hover:bg-purple-900/60";
-                  }
-                } else if (isWeekend) {
-                  colorClasses = "text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-800/50";
-                }
-
+              {days.map(({ day, dateStr, holiday, isToday, colorClasses }) => {
                 return (
                   <div 
                     key={dateStr} 
@@ -114,4 +114,6 @@ export const CalendarView = ({ year, holidays }: CalendarViewProps) => {
       })}
     </div>
   );
-};
+});
+
+CalendarView.displayName = 'CalendarView';
