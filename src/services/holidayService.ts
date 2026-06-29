@@ -22,6 +22,7 @@ export const fetchHolidays = (year: number, signal?: AbortSignal): Promise<Holid
       signal,
       credentials: 'omit',
       redirect: 'error',
+      referrerPolicy: 'no-referrer',
       headers: {
         'Accept': 'application/json'
       }
