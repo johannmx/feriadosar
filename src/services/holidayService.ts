@@ -96,21 +96,26 @@ export const fetchHolidays = (year: number, signal?: AbortSignal): Promise<Holid
       throw new Error('API response too large');
     }
 
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+
     // Explicitly map properties to avoid implicit typecasting and dropped properties bypass
     const validatedHolidays = data.reduce((acc: Holiday[], h: unknown) => {
       if (!h || typeof h !== 'object') return acc;
       const item = h as Record<string, unknown>;
 
-      // Validate required types and constraints (Defense-in-depth: exact schemas & HTML injection prevention)
+      // Validate required types and constraints
+      // Enforce strict date format and reject HTML characters to prevent XSS/injection at the network boundary
       if (typeof item.fecha === 'string' &&
-          /^\d{4}-\d{2}-\d{2}$/.test(item.fecha) &&
+          dateRegex.test(item.fecha) &&
           !isNaN(new Date(item.fecha + 'T00:00:00').getTime()) &&
           typeof item.tipo === 'string' &&
           item.tipo.length <= 50 &&
-          !/[<>]/.test(item.tipo) &&
+          !item.tipo.includes('<') &&
+          !item.tipo.includes('>') &&
           typeof item.nombre === 'string' &&
           item.nombre.length <= 255 &&
-          !/[<>]/.test(item.nombre)) {
+          !item.nombre.includes('<') &&
+          !item.nombre.includes('>')) {
 
         // Map exclusively the expected properties
         acc.push({
