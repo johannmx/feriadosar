@@ -129,3 +129,8 @@
 **Vulnerability:** The application was using the Fetch API to request data from an external API without specifying a `referrerPolicy`. By default, browsers may include the `Referer` header in outgoing requests, which can leak the full URL of the referring page (including potentially sensitive query parameters or internal path structures) to the third-party server.
 **Learning:** Relying on default browser behavior for cross-origin network requests can unintentionally expose internal application context or sensitive data embedded in URLs to external parties.
 **Prevention:** When using `fetch` for external API requests, explicitly configure `referrerPolicy: 'no-referrer'` to ensure the browser strictly drops the `Referer` header, protecting application privacy and minimizing information leakage.
+
+## 2026-07-13 - [Strict Numeric Validation Boundaries]
+**Vulnerability:** When enforcing numeric validation boundaries (e.g., Content-Length checks or Date timestamp checks), relying on inverted positive conditions like `!isNaN(val) && val < limit` or using the global `isNaN` implicitly evaluates to false on malformed input (like NaN), causing fail-open vulnerabilities and passing invalid data forward.
+**Learning:** Global `isNaN` coerces values, which can lead to unexpected true/false returns. Implicit typecasting and fail-open validation logic leave the application vulnerable to processing malformed payload boundaries.
+**Prevention:** When enforcing numeric validation boundaries, explicitly handle and fail securely on invalid parser outputs. Prefer `Number.isNaN(val)` over global `isNaN` for strict type checking, and actively prevent `NaN` bypasses (e.g., `Number.isNaN(val) || val > limit`).

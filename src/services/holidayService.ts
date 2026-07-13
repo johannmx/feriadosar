@@ -38,6 +38,17 @@ export const fetchHolidays = (year: number, signal?: AbortSignal): Promise<Holid
 
     let data;
     try {
+      const MAX_BYTES = 50000;
+
+      // Early rejection if Content-Length exceeds limits or is malformed
+      const contentLengthHeader = res.headers.get('content-length');
+      if (contentLengthHeader) {
+        const contentLength = Number(contentLengthHeader);
+        if (Number.isNaN(contentLength) || contentLength > MAX_BYTES) {
+          throw new Error('API response too large or invalid Content-Length');
+        }
+      }
+
       const reader = res.body?.getReader();
       if (!reader) {
         throw new Error('ReadableStream not supported or missing');
@@ -45,7 +56,6 @@ export const fetchHolidays = (year: number, signal?: AbortSignal): Promise<Holid
 
       let receivedLength = 0;
       const chunks: Uint8Array[] = [];
-      const MAX_BYTES = 50000;
 
       while (true) {
         const { done, value } = await reader.read();
@@ -107,7 +117,7 @@ export const fetchHolidays = (year: number, signal?: AbortSignal): Promise<Holid
       // Enforce strict date format and reject HTML characters to prevent XSS/injection at the network boundary
       if (typeof item.fecha === 'string' &&
           dateRegex.test(item.fecha) &&
-          !isNaN(new Date(item.fecha + 'T00:00:00').getTime()) &&
+          !Number.isNaN(new Date(item.fecha + 'T00:00:00').getTime()) &&
           typeof item.tipo === 'string' &&
           item.tipo.length <= 50 &&
           !item.tipo.includes('<') &&
