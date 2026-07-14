@@ -1,10 +1,10 @@
 import { useMemo, memo } from 'react';
+import { getTodayDateString } from '../utils/dateUtils';
 import type { Holiday } from '../types/holiday';
 
 interface CalendarViewProps {
   year: number;
   holidays: Holiday[];
-  todayStr: string;
 }
 
 const MONTHS = [
@@ -12,13 +12,28 @@ const MONTHS = [
   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
 ];
 
-export const CalendarView = memo(({ year, holidays, todayStr }: CalendarViewProps) => {
-  // Precompute calendar months data (days in month, offsets, styles, holidays) to prevent creating
-  // multiple Date objects, Arrays, and running layout logic on every render (e.g. during theme toggles)
-  const monthsData = useMemo(() => {
-    const holidayMap = new Map<string, Holiday>();
-    holidays.forEach(h => holidayMap.set(h.fecha, h));
+interface CalendarDay {
+  day: number;
+  dateStr: string;
+  holiday?: Holiday;
+  isToday: boolean;
+  colorClasses: string;
+}
 
+export const CalendarView = memo(({ year, holidays }: CalendarViewProps) => {
+  // Map from "YYYY-MM-DD" to holiday object
+  const holidayMap = useMemo(() => {
+    const map = new Map<string, Holiday>();
+    holidays.forEach(h => map.set(h.fecha, h));
+    return map;
+  }, [holidays]);
+
+  // Use local time matching Argentina
+  const todayStr = getTodayDateString();
+
+  // Precompute calendar months data (days in month, offsets, etc.) to prevent creating
+  // multiple Date objects, maps, and arrays on every render (e.g. on theme toggles)
+  const monthsData = useMemo(() => {
     return MONTHS.map((monthName, mIdx) => {
       const daysInMonth = new Date(year, mIdx + 1, 0).getDate();
       const firstOfMonth = new Date(year, mIdx, 1);
@@ -32,12 +47,13 @@ export const CalendarView = memo(({ year, holidays, todayStr }: CalendarViewProp
       const monthStr = String(mIdx + 1).padStart(2, '0');
       const datePrefix = `${year}-${monthStr}-`;
 
-      const days = Array.from({ length: daysInMonth }, (_, i) => {
+      const emptyDays = Array.from({ length: firstDay }, (_, i) => i);
+      const days: CalendarDay[] = Array.from({ length: daysInMonth }, (_, i) => {
         const day = i + 1;
         const dateStr = `${datePrefix}${day < 10 ? '0' : ''}${day}`;
         const holiday = holidayMap.get(dateStr);
 
-        const dayOfWeek = (startDayOfWeek + i) % 7;
+        const dayOfWeek = (startDayOfWeek + (day - 1)) % 7;
         const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
         const isToday = dateStr === todayStr;
 
@@ -62,21 +78,21 @@ export const CalendarView = memo(({ year, holidays, todayStr }: CalendarViewProp
           dateStr,
           holiday,
           isToday,
-          colorClasses,
+          colorClasses
         };
       });
 
       return {
         monthName,
-        firstDay,
+        emptyDays,
         days,
       };
     });
-  }, [year, holidays, todayStr]);
+  }, [year, holidayMap, todayStr]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-      {monthsData.map(({ monthName, firstDay, days }) => {
+      {monthsData.map(({ monthName, emptyDays, days }) => {
         return (
           <div key={monthName} className="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md transition-shadow">
             <h3 className="text-lg font-black tracking-tight text-slate-800 dark:text-white uppercase mb-4 text-center">{monthName}</h3>
@@ -88,7 +104,7 @@ export const CalendarView = memo(({ year, holidays, todayStr }: CalendarViewProp
             </div>
             
             <div className="grid grid-cols-7 gap-1 text-center">
-              {[...Array(firstDay)].map((_, i) => <div key={`empty-${i}`} />)}
+              {emptyDays.map(i => <div key={`empty-${i}`} />)}
               
               {days.map(({ day, dateStr, holiday, isToday, colorClasses }) => {
                 return (
