@@ -128,16 +128,17 @@ export const fetchHolidays = (year: number, signal?: AbortSignal): Promise<Holid
           !item.nombre.includes('>')) {
 
         // Map exclusively the expected properties
-        acc.push({
+        // Security Enhancement: Deep freeze to prevent client-side cache poisoning
+        acc.push(Object.freeze({
           fecha: item.fecha,
           tipo: item.tipo,
           nombre: item.nombre
-        });
+        }));
       }
       return acc;
     }, []);
 
-    return validatedHolidays;
+    return Object.freeze(validatedHolidays) as Holiday[];
   })();
 
   // Cache the promise
