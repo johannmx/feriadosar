@@ -101,4 +101,39 @@ describe('holidayService', () => {
       { fecha: '2026-01-01', tipo: 'inamovible', nombre: 'Año Nuevo' }
     ]);
   });
+
+  it('should freeze the returned array and its objects to prevent client-side cache poisoning', async () => {
+    const mockHolidays = [
+      { fecha: '2026-01-01', tipo: 'inamovible', nombre: 'Año Nuevo' }
+    ];
+
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      body: {
+        getReader: () => {
+          let done = false;
+          return {
+            read: async () => {
+              if (done) return { done: true, value: undefined };
+              done = true;
+              return {
+                done: false,
+                value: new TextEncoder().encode(JSON.stringify(mockHolidays))
+              };
+            },
+            cancel: async () => {}
+          };
+        }
+      } as unknown as ReadableStream<Uint8Array>
+    } as Response);
+
+    const result = await fetchHolidays(2029);
+
+    // Verify the array is frozen
+    expect(Object.isFrozen(result)).toBe(true);
+
+    // Verify the objects inside the array are frozen
+    expect(Object.isFrozen(result[0])).toBe(true);
+  });
 });
