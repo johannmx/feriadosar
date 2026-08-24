@@ -18,11 +18,13 @@ export const fetchHolidays = (year: number, signal?: AbortSignal): Promise<Holid
   }
 
   const promise = (async () => {
+    // Security Enhancement: explicitly disable cache to prevent client-side cache poisoning from potentially compromised external APIs
     const res = await fetch(`https://api.argentinadatos.com/v1/feriados/${year}`, {
       signal,
       credentials: 'omit',
       redirect: 'error',
       referrerPolicy: 'no-referrer',
+      cache: 'no-store',
       headers: {
         'Accept': 'application/json'
       }
