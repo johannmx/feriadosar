@@ -23,6 +23,7 @@ export const fetchHolidays = (year: number, signal?: AbortSignal): Promise<Holid
       credentials: 'omit',
       redirect: 'error',
       referrerPolicy: 'no-referrer',
+      cache: 'no-store', // Security Enhancement: Prevent client-side cache poisoning
       headers: {
         'Accept': 'application/json'
       }
